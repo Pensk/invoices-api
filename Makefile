@@ -29,3 +29,6 @@ migrate:
 
 migrate-down:
 	docker compose run --rm migrate -path=/migrations/ -database="mysql://invoice:invoice@tcp(mysql:3306)/invoices" down -all
+
+seed-db:
+	docker compose exec -T mysql mysql -uinvoice -D invoices -pinvoice < go/db/fixtures/company_data.sql
