@@ -20,3 +20,12 @@ mysql:
 
 mod-tidy:
 	docker compose run --rm invoices go mod tidy
+
+mysql:
+	docker compose exec mysql mysql -uinvoice -D invoices -pinvoice
+
+migrate:
+	docker compose run --rm migrate -path=/migrations/ -database="mysql://invoice:invoice@tcp(mysql:3306)/invoices" up
+
+migrate-down:
+	docker compose run --rm migrate -path=/migrations/ -database="mysql://invoice:invoice@tcp(mysql:3306)/invoices" down -all
