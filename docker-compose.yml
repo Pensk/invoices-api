@@ -1,0 +1,36 @@
+version: '3'
+services:
+  invoices:
+    build:
+      context: go
+    volumes:
+      - ./go:/app
+    depends_on:
+      - mysql
+    ports:
+      - 8080:8080
+    environment:
+      - DSN
+      - ADDR
+      - ENV
+
+  migrate:
+    image: migrate/migrate
+    command: -path=/migrations/ -database="postgresql://aichieve:aichieve@postgres:5432/aichieve?sslmode=disable" up
+    volumes:
+      - ./go/migrations:/migrations
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: invoice
+      MYSQL_PASSWORD: invoice
+      MYSQL_DATABASE: invoices
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
