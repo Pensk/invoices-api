@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/go-chi/chi"
@@ -57,7 +59,8 @@ func TestAuthenticateUser(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			userService := new(MockUserService)
 			router := chi.NewRouter()
-			handler.NewUserHandler(router, userService)
+			logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{}))
+			handler.NewUserHandler(router, userService, logger)
 
 			tc.runMock(userService)
 
@@ -122,7 +125,8 @@ func TestCreateUser(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			userService := new(MockUserService)
 			router := chi.NewRouter()
-			handler.NewUserHandler(router, userService)
+			logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{}))
+			handler.NewUserHandler(router, userService, logger)
 
 			tc.runMock(userService)
 

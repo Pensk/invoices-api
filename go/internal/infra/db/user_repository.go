@@ -17,6 +17,16 @@ func NewUserRepository(db *sql.DB) repositories.UserRepository {
 	}
 }
 
+func (r *UserRepository) GetByID(id int) (*model.User, error) {
+	user := &model.User{}
+	query := `SELECT id, email, password_hash, company_id FROM users WHERE id = ?`
+	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.CompanyID)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (r *UserRepository) GetByEmail(email string) (*model.User, error) {
 	user := &model.User{}
 	query := `SELECT id, email, password_hash, company_id FROM users WHERE email = ?`

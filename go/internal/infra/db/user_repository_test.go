@@ -20,7 +20,7 @@ func TestUserRepository_GetByEmail(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "email", "password", "company_id"}).
 		AddRow(1, "test@example.com", "hashpassword", 3)
 
-	mock.ExpectQuery(`SELECT id, email, password, company_id FROM users WHERE email = \?`).
+	mock.ExpectQuery(`SELECT id, email, password_hash, company_id FROM users WHERE email = \?`).
 		WithArgs("test@example.com").
 		WillReturnRows(rows)
 
@@ -40,7 +40,7 @@ func TestUserRepository_Create(t *testing.T) {
 	}
 	defer sqldb.Close()
 
-	mock.ExpectExec(`INSERT INTO users \(company_id, name, email, password\) VALUES \(\?, \?, \?, \?\)`).
+	mock.ExpectExec(`INSERT INTO users \(company_id, name, email, password_hash\) VALUES \(\?, \?, \?, \?\)`).
 		WithArgs(3, "user name", "test@example.com", "hashedpassword").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 

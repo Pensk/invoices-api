@@ -8,6 +8,7 @@ import (
 	"github.com/pensk/invoices-api/internal/infra/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type MockUserRepository struct {
@@ -18,6 +19,11 @@ func (m *MockUserRepository) Create(user *model.User) error {
 	args := m.Called(user)
 	user.ID = 1
 	return args.Error(0)
+}
+
+func (m *MockUserRepository) GetByID(id int) (*model.User, error) {
+	args := m.Called(id)
+	return args.Get(0).(*model.User), args.Error(1)
 }
 
 func (m *MockUserRepository) GetByEmail(email string) (*model.User, error) {
@@ -72,7 +78,9 @@ func TestUserService_Authenticate(t *testing.T) {
 		Password: "password",
 	}
 
-	user := &model.User{ID: 1}
+	hashedPass, _ := bcrypt.GenerateFromPassword([]byte(cmd.Password), bcrypt.DefaultCost)
+
+	user := &model.User{ID: 1, PasswordHash: string(hashedPass)}
 
 	userRepo.On("GetByEmail", cmd.Email).Return(user, nil)
 

@@ -39,8 +39,10 @@ func main() {
 
 	ur := db.NewUserRepository(sqldb)
 	cr := db.NewCompanyRepository(sqldb)
+	ir := db.NewInvoiceRepository(sqldb)
 
 	us := services.NewUserService(ur, cr)
+	is := services.NewInvoiceService(ir)
 
 	router := chi.NewRouter()
 	api := chi.NewRouter()
@@ -48,6 +50,7 @@ func main() {
 	router.Mount("/api", api)
 
 	handler.NewUserHandler(api, us, logger)
+	handler.NewInvoiceHandler(api, is, logger)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", addr),
