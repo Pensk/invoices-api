@@ -13,3 +13,8 @@ func (m *MockUserService) Authenticate(cmd *command.AuthenticateUserCommand) (*c
 	args := m.Called(cmd)
 	return args.Get(0).(*command.AuthenticateUserResult), args.Error(1)
 }
+
+func (m *MockUserService) Create(cmd *command.CreateUserCommand) (*command.CreateUserResult, error) {
+	args := m.Called(cmd)
+	return args.Get(0).(*command.CreateUserResult), args.Error(1)
+}
