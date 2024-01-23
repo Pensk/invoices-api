@@ -1,10 +1,15 @@
-.PHONY: shell
+.PHONY: shell setup
+
+setup: build up-daemon mod-tidy migrate seed-db
 
 build:
 	docker compose build
 
 up:
 	docker compose up
+
+up-daemon:
+	docker compose up -d
 
 down:
 	docker compose down
