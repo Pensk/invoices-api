@@ -21,11 +21,13 @@ func NewInvoiceHandler(router chi.Router, service interfaces.InvoiceService, log
 		logger:  logger,
 	}
 
-	router.Post("/invoices", handler.Create)
-	router.Get("/invoices", handler.List)
+	router.Post("/", handler.Create)
+	router.Get("/", handler.List)
 }
 
 func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var req *request.CreateInvoiceRequest
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&req)
@@ -42,6 +44,8 @@ func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	cmd.CompanyID = ctx.Value("company_id").(int)
+
 	res, err := h.service.Create(cmd)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -54,5 +58,33 @@ func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *InvoiceHandler) List(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	var req *request.ListInvoiceRequest
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&req)
+	if err != nil {
+		h.logger.Error(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	cmd, err := req.ToListInvoiceCommand()
+	if err != nil {
+		h.logger.Error(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	cmd.CompanyID = ctx.Value("company_id").(int)
+
+	res, err := h.service.List(cmd)
+	if err != nil {
+		h.logger.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(res)
 
 }

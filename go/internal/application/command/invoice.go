@@ -16,10 +16,11 @@ type CreateInvoiceCommand struct {
 }
 
 type CreateInvoiceResult struct {
-	Invoice *model.Invoice
+	Invoice *model.Invoice `json:"invoice"`
 }
 
 type ListInvoiceCommand struct {
+	CompanyID int
 	StartDate time.Time
 	EndDate   time.Time
 	PerPage   int
@@ -27,5 +28,6 @@ type ListInvoiceCommand struct {
 }
 
 type ListInvoiceResult struct {
-	Invoices []*model.Invoice
+	Invoices []*model.Invoice `json:"invoices"`
+	Count    int              `json:"count"`
 }
