@@ -9,6 +9,7 @@ import (
 	"github.com/pensk/invoices-api/internal/application/interfaces"
 	"github.com/pensk/invoices-api/internal/domain/repositories"
 	"github.com/pensk/invoices-api/internal/infra/model"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -46,6 +47,11 @@ func (s *UserService) Authenticate(cmd *command.AuthenticateUserCommand) (*comma
 		return nil, err
 	}
 
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(cmd.Password))
+	if err != nil {
+		return nil, err
+	}
+
 	token, err := generateToken(user.ID)
 	if err != nil {
 		return nil, err
@@ -60,12 +66,18 @@ func (s *UserService) Create(cmd *command.CreateUserCommand) (*command.CreateUse
 		return nil, err
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(cmd.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
 	user := &model.User{
 		Name:         cmd.Name,
 		Email:        cmd.Email,
-		PasswordHash: cmd.Password,
+		PasswordHash: string(hashedPassword),
 		CompanyID:    company.ID,
 	}
+
 	err = s.ur.Create(user)
 	if err != nil {
 		return nil, err

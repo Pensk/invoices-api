@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -11,11 +12,13 @@ import (
 
 type UserHandler struct {
 	service interfaces.UserService
+	logger  *slog.Logger
 }
 
-func NewUserHandler(router chi.Router, service interfaces.UserService) {
+func NewUserHandler(router chi.Router, service interfaces.UserService, logger *slog.Logger) {
 	handler := &UserHandler{
 		service: service,
+		logger:  logger,
 	}
 
 	router.Post("/users/authenticate", handler.Authenticate)
@@ -52,18 +55,21 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&req)
 	if err != nil {
+		h.logger.Error(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	cmd, err := req.ToCreateUserCommand()
 	if err != nil {
+		h.logger.Error(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	res, err := h.service.Create(cmd)
 	if err != nil {
+		h.logger.Error(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

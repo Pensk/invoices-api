@@ -47,7 +47,7 @@ func main() {
 
 	router.Mount("/api", api)
 
-	handler.NewUserHandler(api, us)
+	handler.NewUserHandler(api, us, logger)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", addr),
