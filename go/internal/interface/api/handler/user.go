@@ -30,11 +30,16 @@ func (h *UserHandler) Authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Email == "" || req.Password == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	cmd := req.ToAuthenticateUserCommand()
 
 	res, err := h.service.Authenticate(cmd)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 

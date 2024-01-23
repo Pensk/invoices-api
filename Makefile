@@ -32,3 +32,6 @@ migrate-down:
 
 seed-db:
 	docker compose exec -T mysql mysql -uinvoice -D invoices -pinvoice < go/db/fixtures/company_data.sql
+
+test:
+	docker compose exec invoices go test -v ./...
