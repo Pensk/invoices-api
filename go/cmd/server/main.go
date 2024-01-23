@@ -14,6 +14,7 @@ import (
 	"github.com/pensk/invoices-api/internal/application/services"
 	"github.com/pensk/invoices-api/internal/infra/db"
 	"github.com/pensk/invoices-api/internal/interface/api/handler"
+	"github.com/pensk/invoices-api/internal/interface/api/middleware"
 )
 
 func main() {
@@ -44,13 +45,19 @@ func main() {
 	us := services.NewUserService(ur, cr)
 	is := services.NewInvoiceService(ir)
 
+	mw := middleware.NewAuthMiddleware(ur, logger)
+
 	router := chi.NewRouter()
 	api := chi.NewRouter()
 
 	router.Mount("/api", api)
 
 	handler.NewUserHandler(api, us, logger)
-	handler.NewInvoiceHandler(api, is, logger)
+
+	invoiceRouter := chi.NewRouter()
+	invoiceRouter.Use(mw.DecodeJWT)
+	handler.NewInvoiceHandler(invoiceRouter, is, logger)
+	api.Mount("/invoices", invoiceRouter)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", addr),
