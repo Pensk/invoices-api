@@ -38,8 +38,9 @@ func main() {
 	defer sqldb.Close()
 
 	ur := db.NewUserRepository(sqldb)
+	cr := db.NewCompanyRepository(sqldb)
 
-	us := services.NewUserService(ur)
+	us := services.NewUserService(ur, cr)
 
 	router := chi.NewRouter()
 	api := chi.NewRouter()
