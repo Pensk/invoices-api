@@ -18,5 +18,12 @@ func NewCompanyRepository(db *sql.DB) repositories.CompanyRepository {
 }
 
 func (r *CompanyRepository) GetByID(id int) (*model.Company, error) {
-	return nil, nil
+	company := &model.Company{}
+	stmt := `SELECT id, name FROM companies WHERE id = ?`
+
+	err := r.db.QueryRow(stmt, id).Scan(&company.ID, &company.Name)
+	if err != nil {
+		return nil, err
+	}
+	return company, nil
 }
